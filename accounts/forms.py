@@ -54,7 +54,7 @@ class PasswordChangeForm(forms.Form):
      
 
         if password and len(password)<12:
-            self.add_error('new_password', "Passwords do not match.")
+            self.add_error('new_password', "Your password is less secure make sure you create a strong password more than 12 character ")
         return cleaned_data
 
 
@@ -72,3 +72,7 @@ class PasswordResetForm(forms.Form):
         if password and confirm_password and password != confirm_password:
             self.add_error('confirm_password', "Passwords do not match.")
 
+
+
+
+    

@@ -8,6 +8,9 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, send_mail
 from django.template.loader import render_to_string
 from django.http import HttpResponse
+from .signals import account_created_email
+
+
 
 
 from .forms import (
@@ -18,7 +21,6 @@ class  UserloginView(View):
 
     form = UserLoginForm()
     def get(self, request, *args, **kwargs):
-
         
         context = {
             'form': self.form, 
@@ -70,7 +72,7 @@ class CreateNewUserView(View):
             login(request, user)
             return redirect('dashboard:index')
         else: 
-            print(form.errors)
+            messages.error(request, "Please enter the right credentails ")
             
         return render(request, 'accounts/create_account.html', {"form": form})
     
@@ -100,12 +102,18 @@ class PasswordChangeView(View):
                 login(request,user)
                 messages.success(request, 'Password change successfuly ')
                 return redirect('dashboard:index')
+            else:
+                # if the user is none 
+                messages.error(request, "Please enter the right credentials ")
+        
+        return render(request, 'accounts/password_change.html', {"form": form})
+    
             
 
 
 
 class PasswordResetView(generic.TemplateView):
-    template_name = 'accounts/password_reset.html'
+    template_name = 'accounts/reset.html'
     
 
 class PasswordResetEmailView(View):
@@ -135,9 +143,8 @@ class PasswordResetEmailView(View):
             email_message.attach_alternative(html_content, "text/html")
             email_message.send()
 
-            return HttpResponse("Reset link sent to your email.")
-        
-        return HttpResponse("No user found with that email.")
+        return render(request, 'accounts/email_confirmation.html')
+    
 
 
 class ResetPasswordView(View):
